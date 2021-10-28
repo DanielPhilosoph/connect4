@@ -1,35 +1,37 @@
 const BOARD_SIZE = 7;
-class view {
+class View {
   constructor() {
+    this._selectedColumn = -1;
     // Create board
-    let root = document.querySelector("#root");
+    this.root = document.querySelector("#root");
     let boardTable = this.#createTable();
-    root.append(boardTable);
+    this.root.append(boardTable);
   }
 
   #createTable() {
     let mainTable = this.#createElement("table");
+    let tbody = this.#createElement("tbody");
     for (let i = 0; i < BOARD_SIZE; i++) {
       let tr = this.#createElement("tr");
       if (i === 0) {
+        let thead = this.#createElement("thead");
         for (let j = 0; j < BOARD_SIZE; j++) {
           let button = this.#createElement(
             "button",
             ["drop here"],
-            [],
-            { id: "b" + j },
-            {
-              click: (event) => {
-                this.#onClick(event);
-              },
-            }
+            ["dropBtn"],
+            { id: "b" + j }
           );
           tr.append(this.#createElement("td", [button]));
         }
+        thead.append(tr);
+        mainTable.append(thead);
       } else {
         for (let j = 0; j < BOARD_SIZE; j++) {
           tr.append(this.#createElement("td", [`Y${i} X${j}`]));
         }
+        tbody.append(tr);
+        mainTable.append(tbody);
       }
       mainTable.append(tr);
     }
@@ -37,33 +39,34 @@ class view {
   }
 
   render(board) {
-    console.log(board);
     let mainTable = this.#createElement("table");
+    let tbody = this.#createElement("tbody");
     for (let i = 0; i < BOARD_SIZE; i++) {
       let tr = this.#createElement("tr");
       if (i === 0) {
+        let thead = this.#createElement("thead");
         for (let j = 0; j < BOARD_SIZE; j++) {
           let button = this.#createElement(
             "button",
             ["drop here"],
-            [],
-            { id: "b" + j },
+            [".dropBtn"],
             {
-              click: (event) => {
-                this.#onClick(event);
-              },
+              id: "b" + j,
             }
           );
           tr.append(this.#createElement("td", [button]));
         }
+        thead.append(tr);
+        mainTable.append(thead);
       } else {
         for (let j = 0; j < BOARD_SIZE; j++) {
           tr.append(this.#createElement("td", [board[i][j]]));
         }
+        tbody.append(tr);
+        mainTable.append(tbody);
       }
-      mainTable.append(tr);
     }
-    return mainTable;
+    this.root.append(mainTable);
   }
 
   #createElement(
@@ -95,13 +98,15 @@ class view {
     return myElement;
   }
 
-  #onClick(event) {
-    event.preventDefault();
-    let id = event.target.id;
-    this.#bindOnTurnPlayed(event.target.id);
+  bindOnTurnPlayed(turnHandler) {
+    let btnArray = document.querySelectorAll(".dropBtn");
+    btnArray.forEach((button) => {
+      button.addEventListener("click", (event) => {
+        this._selectedColumn = event.target.id.split("")[1];
+        turnHandler(this._selectedColumn);
+      });
+    });
   }
-
-  #bindOnTurnPlayed(id, turnHandler) {}
 
   // functions:
   // 1. place a coin - make the turn
@@ -131,17 +136,19 @@ class Module {
   }
 
   playingTurn(column) {
-    if (this._board[column][BOARD_SIZE - 1] === 0) {
-      let flag = true;
-      for (let i = BOARD_SIZE - 1; i >= 0; i--) {
-        if (this._board[i][column] === 0) {
-          this._board[i][column] = this._turn;
-          if (this.#checkWinner(this._board) !== false) {
-            console.log("WINNER");
+    if (column !== -1) {
+      if (this._board[column][BOARD_SIZE - 1] === 0) {
+        let flag = true;
+        for (let i = BOARD_SIZE - 1; i >= 0; i--) {
+          if (this._board[i][column] === 0) {
+            this._board[i][column] = this._turn;
+            if (this.#checkWinner(this._board) !== false) {
+              console.log("WINNER");
+              break;
+            }
+            this.#changeTurn();
             break;
           }
-          this.#changeTurn();
-          break;
         }
       }
     }
@@ -213,22 +220,19 @@ class Module {
   // 4. reset game
 }
 class controller {
-  //#modle;
-  //#view;
-  constructor(model, view) {
-    //this.#model = model;
-    //this.#view = view;
-    //this.#view.#bindTurnPlayed(this.#handleTurnPlayed);
+  constructor(mainModel, mainView) {
+    this.module = mainModel;
+    this.view = mainView;
+    this.view.bindOnTurnPlayed(this.handleTurnPlayed);
   }
 
-  #handleTurnPlayed(column) {
-    //this.#modle.playingTurn(column);
-  }
+  handleTurnPlayed = (column) => {
+    this.module.playingTurn(column);
+    this.view.render(this.module._board);
+  };
 }
 
-let y = new view();
-// x.playingTurn(0);
-let x = new Module("1", "2");
+let z = new controller(new Module("1", "2"), new View());
 // x.playingTurn(0);
 // x.playingTurn(1);
 // x.playingTurn(6);
