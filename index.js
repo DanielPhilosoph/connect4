@@ -1,17 +1,16 @@
 const BOARD_SIZE = 7;
 class View {
   constructor() {
-    this._selectedColumn = -1;
     // Create board
     this.root = document.querySelector("#root");
-    let boardTable = this.#createTable();
-    this.root.append(boardTable);
+    this.boardTable = this.#createTable();
+    this.root.append(this.boardTable);
   }
 
   #createTable() {
-    let mainTable = this.#createElement("table");
+    let mainTable = this.#createElement("table", [], ["main_table"]);
     let tbody = this.#createElement("tbody");
-    for (let i = 0; i < BOARD_SIZE; i++) {
+    for (let i = 0; i < BOARD_SIZE + 1; i++) {
       let tr = this.#createElement("tr");
       if (i === 0) {
         let thead = this.#createElement("thead");
@@ -33,40 +32,23 @@ class View {
         tbody.append(tr);
         mainTable.append(tbody);
       }
-      mainTable.append(tr);
     }
     return mainTable;
   }
 
   render(board) {
-    let mainTable = this.#createElement("table");
+    // reset all board
+    this.root.firstElementChild.children[1].remove();
+    // build tbody with board info
     let tbody = this.#createElement("tbody");
     for (let i = 0; i < BOARD_SIZE; i++) {
       let tr = this.#createElement("tr");
-      if (i === 0) {
-        let thead = this.#createElement("thead");
-        for (let j = 0; j < BOARD_SIZE; j++) {
-          let button = this.#createElement(
-            "button",
-            ["drop here"],
-            [".dropBtn"],
-            {
-              id: "b" + j,
-            }
-          );
-          tr.append(this.#createElement("td", [button]));
-        }
-        thead.append(tr);
-        mainTable.append(thead);
-      } else {
-        for (let j = 0; j < BOARD_SIZE; j++) {
-          tr.append(this.#createElement("td", [board[i][j]]));
-        }
-        tbody.append(tr);
-        mainTable.append(tbody);
+      for (let j = 0; j < BOARD_SIZE; j++) {
+        tr.append(this.#createElement("td", [board[i][j]]));
       }
+      tbody.append(tr);
     }
-    this.root.append(mainTable);
+    this.boardTable.append(tbody);
   }
 
   #createElement(
@@ -102,8 +84,8 @@ class View {
     let btnArray = document.querySelectorAll(".dropBtn");
     btnArray.forEach((button) => {
       button.addEventListener("click", (event) => {
-        this._selectedColumn = event.target.id.split("")[1];
-        turnHandler(this._selectedColumn);
+        event.preventDefault();
+        turnHandler(event.target.id.split("")[1]);
       });
     });
   }
@@ -136,19 +118,16 @@ class Module {
   }
 
   playingTurn(column) {
-    if (column !== -1) {
-      if (this._board[column][BOARD_SIZE - 1] === 0) {
-        let flag = true;
-        for (let i = BOARD_SIZE - 1; i >= 0; i--) {
-          if (this._board[i][column] === 0) {
-            this._board[i][column] = this._turn;
-            if (this.#checkWinner(this._board) !== false) {
-              console.log("WINNER");
-              break;
-            }
-            this.#changeTurn();
+    if (this._board[0][column] === 0) {
+      for (let i = BOARD_SIZE - 1; i >= 0; i--) {
+        if (this._board[i][column] === 0) {
+          this._board[i][column] = this._turn;
+          if (this.#checkWinner(this._board) !== false) {
+            console.log("WINNER " + this._turn);
             break;
           }
+          this.#changeTurn();
+          break;
         }
       }
     }

@@ -1,0 +1,21 @@
+.main_table {
+  margin: auto;
+  width: 40%;
+  height: 45%;
+  border: 1px solid black;
+  text-align: center;
+}
+.dropBtn {
+  border-radius: 12px;
+  background-color: tomato;
+  transition: 0.3s;
+  color: white;
+  border: none;
+  padding: 7px 9px;
+}
+.dropBtn:hover {
+  opacity: 0.5;
+}
+tbody {
+  background-image: ;
+}
