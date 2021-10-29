@@ -8,6 +8,7 @@ class View {
   }
 
   #createTable() {
+    document.querySelector("#turn").textContent = "Player 1";
     let mainTable = this.#createElement("table", [], ["main_table"]);
     let tbody = this.#createElement("tbody");
     for (let i = 0; i < BOARD_SIZE + 1; i++) {
@@ -27,7 +28,7 @@ class View {
         mainTable.append(thead);
       } else {
         for (let j = 0; j < BOARD_SIZE; j++) {
-          tr.append(this.#createElement("td", [`Y${i} X${j}`]));
+          tr.append(this.#createElement("td", []));
         }
         tbody.append(tr);
         mainTable.append(tbody);
@@ -36,7 +37,16 @@ class View {
     return mainTable;
   }
 
-  render(board) {
+  render(board, turn, winner) {
+    if (winner !== undefined) {
+      document.querySelector("#turn").textContent = "";
+      document.querySelector("#winner").textContent = `'${
+        winner.charAt(0).toUpperCase() + turn.slice(1)
+      }' Color is the winner!`;
+      this.#disableAllButtons();
+    }
+    document.querySelector("#turn").textContent =
+      turn.charAt(0).toUpperCase() + turn.slice(1) + "'s Turn";
     // reset all board
     this.root.firstElementChild.children[1].remove();
     // build tbody with board info
@@ -44,11 +54,22 @@ class View {
     for (let i = 0; i < BOARD_SIZE; i++) {
       let tr = this.#createElement("tr");
       for (let j = 0; j < BOARD_SIZE; j++) {
-        tr.append(this.#createElement("td", [board[i][j]]));
+        tr.append(
+          this.#createElement("td", [], [], {
+            style: "background-color:" + board[i][j],
+          })
+        );
       }
       tbody.append(tr);
     }
     this.boardTable.append(tbody);
+  }
+
+  #disableAllButtons() {
+    let btnArray = document.querySelectorAll(".dropBtn");
+    btnArray.forEach((button) => {
+      button.disabled = true;
+    });
   }
 
   #createElement(
@@ -99,7 +120,7 @@ class Module {
   constructor(color1, color2) {
     // Create data strucure
     this._turn = color1;
-    this._winner;
+    this._winner = undefined;
     this._color1 = color1;
     this._color2 = color2;
     this._board = this._board = [
@@ -123,14 +144,47 @@ class Module {
         if (this._board[i][column] === 0) {
           this._board[i][column] = this._turn;
           if (this.#checkWinner(this._board) !== false) {
-            console.log("WINNER " + this._turn);
+            this._winner = this._turn;
+            break;
+          } else {
+            this.#changeTurn();
             break;
           }
-          this.#changeTurn();
-          break;
         }
       }
     }
+  }
+
+  get turn() {
+    return this._turn;
+  }
+
+  set turn(value) {
+    this._turn = value;
+  }
+
+  get color1() {
+    return this._color1;
+  }
+
+  get color2() {
+    return this._color2;
+  }
+
+  get board() {
+    return this._board;
+  }
+
+  set board(value) {
+    this._board = value;
+  }
+
+  get winner() {
+    return this._winner;
+  }
+
+  set winner(value) {
+    this._winner = value;
   }
 
   #chkLine(a, b, c, d) {
@@ -207,11 +261,11 @@ class controller {
 
   handleTurnPlayed = (column) => {
     this.module.playingTurn(column);
-    this.view.render(this.module._board);
+    this.view.render(this.module._board, this.module.turn, this.module.winner);
   };
 }
 
-let z = new controller(new Module("1", "2"), new View());
+let z = new controller(new Module("blue", "red"), new View());
 // x.playingTurn(0);
 // x.playingTurn(1);
 // x.playingTurn(6);

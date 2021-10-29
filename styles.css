@@ -4,18 +4,52 @@
   height: 45%;
   border: 1px solid black;
   text-align: center;
+  border-collapse: collapse;
 }
 .dropBtn {
   border-radius: 12px;
   background-color: tomato;
-  transition: 0.3s;
+  transition: 0.7s;
   color: white;
   border: none;
   padding: 7px 9px;
 }
 .dropBtn:hover {
-  opacity: 0.5;
+  background-color: rgb(177, 80, 63);
 }
-tbody {
-  background-image: ;
+.headDiv {
+  text-align: center;
+  margin: auto;
+  padding: 0.3%;
+  width: 100%;
+  color: lavenderblush;
+  background-color: lightcoral;
+}
+
+.winnerP {
+  text-align: center;
+  margin: auto;
+  color: white;
+  width: 50%;
+  border-radius: 50%;
+  background-color: rgb(119, 172, 66);
+  font-size: 300%;
+}
+.turnP {
+  text-align: center;
+  color: orangered;
+  font-size: 150%;
+}
+thead > tr > td {
+  border: 1px solid black;
+}
+
+tbody > tr > td {
+  border: 1px solid black;
+  padding: 7%;
+  border-radius: 50%;
+}
+
+thead {
+  background-color: darkgray;
 }
