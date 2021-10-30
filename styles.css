@@ -21,7 +21,7 @@
   text-align: center;
   margin: auto;
   padding: 0.3%;
-  width: 100%;
+  width: 99%;
   color: lavenderblush;
   background-color: lightcoral;
 }
@@ -52,7 +52,6 @@
   font-size: 150%;
 }
 .restartBtn {
-  margin-left: 47%;
   align-self: auto;
   color: #ffffff;
   font-weight: 300;
