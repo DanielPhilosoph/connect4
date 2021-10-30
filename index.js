@@ -3,12 +3,25 @@ class View {
   constructor() {
     // Create board
     this.root = document.querySelector("#root");
+    this.upperDiv = document.querySelector("#upperDiv");
+    this.upperDiv.append(this.#createUpperDiv());
     this.boardTable = this.#createTable();
     this.root.append(this.boardTable);
   }
 
+  restart() {
+    this.root.innerHTML = "";
+    this.upperDiv.innerHTML = "";
+    this.boardTable.innerHTML = "";
+  }
+
+  bindFirstPlayerTurn(firstTurnHandler) {
+    let turn = firstTurnHandler();
+    document.querySelector("#turn").textContent =
+      turn.charAt(0).toUpperCase() + turn.slice(1) + "'s Turn";
+  }
+
   #createTable() {
-    document.querySelector("#turn").textContent = "Player 1";
     let mainTable = this.#createElement("table", [], ["main_table"]);
     let tbody = this.#createElement("tbody");
     for (let i = 0; i < BOARD_SIZE + 1; i++) {
@@ -37,16 +50,42 @@ class View {
     return mainTable;
   }
 
+  #createUpperDiv() {
+    let div = this.#createElement("div", [], [], { id: "upper" });
+    div.append(this.#createElement("p", [], ["winnerP"], { id: "winner" }));
+    div.append(this.#createElement("br"));
+    div.append(
+      this.#createElement("button", ["Restart"], ["hidden", "restartBtn"], {
+        id: "restart",
+      })
+    );
+    div.append(this.#createElement("br"));
+    div.append(this.#createElement("p", [], ["turnP"], { id: "turn" }));
+    return div;
+  }
+
+  #createWinnerP(turn, winner) {
+    document.querySelector("#turn").textContent = "";
+    document.querySelector("#restart").classList.add("visible");
+    let winnerP = document.querySelector("#winner");
+    winnerP.textContent = `'${
+      winner.charAt(0).toUpperCase() + turn.slice(1)
+    }' Color is the winner!`;
+  }
+
+  bindResetGame(resetHandler) {
+    document.querySelector("#restart").addEventListener("click", (event) => {
+      resetHandler();
+    });
+  }
+
   render(board, turn, winner) {
-    if (winner !== undefined) {
-      document.querySelector("#turn").textContent = "";
-      document.querySelector("#winner").textContent = `'${
-        winner.charAt(0).toUpperCase() + turn.slice(1)
-      }' Color is the winner!`;
-      this.#disableAllButtons();
-    }
     document.querySelector("#turn").textContent =
       turn.charAt(0).toUpperCase() + turn.slice(1) + "'s Turn";
+    if (winner !== undefined) {
+      this.#createWinnerP(turn, winner);
+      this.#disableAllButtons();
+    }
     // reset all board
     this.root.firstElementChild.children[1].remove();
     // build tbody with board info
@@ -110,11 +149,6 @@ class View {
       });
     });
   }
-
-  // functions:
-  // 1. place a coin - make the turn
-  // 2. winner
-  // 3. change players turns (change a label)
 }
 class Module {
   constructor(color1, color2) {
@@ -233,57 +267,32 @@ class Module {
 
     return false;
   }
-
-  resetBoard() {
-    this._board = [
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-    ];
-  }
-
-  //functions
-  // 1. change turn
-  // 2. playing turn (adding to board)
-  // 3. winner check (check if there is a 4 in a row)
-  // 4. reset game
 }
 class controller {
   constructor(mainModel, mainView) {
     this.module = mainModel;
     this.view = mainView;
     this.view.bindOnTurnPlayed(this.handleTurnPlayed);
+    this.view.bindResetGame(this.handleResetGame);
+    this.view.bindFirstPlayerTurn(this.handlerFirstPlayerTurn);
   }
 
   handleTurnPlayed = (column) => {
     this.module.playingTurn(column);
-    this.view.render(this.module._board, this.module.turn, this.module.winner);
+    this.view.render(this.module.board, this.module.turn, this.module.winner);
+  };
+
+  handleResetGame = () => {
+    this.view.restart();
+    new controller(
+      new Module(this.module.color1, this.module.color2),
+      new View()
+    );
+  };
+
+  handlerFirstPlayerTurn = () => {
+    return this.module.turn;
   };
 }
 
 let z = new controller(new Module("blue", "red"), new View());
-// x.playingTurn(0);
-// x.playingTurn(1);
-// x.playingTurn(6);
-// x.playingTurn(5);
-// x.playingTurn(0);
-// x.playingTurn(1);
-// x.playingTurn(0);
-// x.playingTurn(1);
-// x.playingTurn(2);
-// x.playingTurn(3);
-// x.playingTurn(3);
-// x.playingTurn(2);
-// x.playingTurn(4);
-// x.playingTurn(0);
-// x.resetBoard();
-// //x.playingTurn(3);
-
-// //x.playingTurn(1);
-
-// document.querySelector("body").append(y.render(x._board));
-// // console.log(x._board);

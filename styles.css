@@ -25,13 +25,24 @@
   color: lavenderblush;
   background-color: lightcoral;
 }
-
+.hidden {
+  display: none;
+}
+.visible {
+  display: inline-block;
+}
+.upperDiv {
+  text-align: center;
+}
 .winnerP {
   text-align: center;
-  margin: auto;
+  margin: 0 auto;
+  margin-left: 25%;
   color: white;
   width: 50%;
-  border-radius: 50%;
+  border-radius: 10px;
+  opacity: 0.7;
+  border: green 3px solid;
   background-color: rgb(119, 172, 66);
   font-size: 300%;
 }
@@ -39,6 +50,15 @@
   text-align: center;
   color: orangered;
   font-size: 150%;
+}
+.restartBtn {
+  margin-left: 47%;
+  align-self: auto;
+  color: #ffffff;
+  font-weight: 300;
+  padding: 0.3em 1.2em;
+  border-radius: 2em;
+  background-color: #4eb5f1;
 }
 thead > tr > td {
   border: 1px solid black;
